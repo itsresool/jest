@@ -7,9 +7,9 @@
  * @flow
  */
 
-import {ChildProcess, spawn} from 'child_process';
+import { ChildProcess, spawn } from 'child_process';
 import ProjectWorkspace from './project_workspace';
-import type {SpawnOptions} from './types';
+import type { SpawnOptions } from './types';
 
 /**
  * Spawns and returns a Jest process with specific args
@@ -27,7 +27,12 @@ export const createProcess = (
   // any other bits into the args
   const runtimeExecutable = workspace.pathToJest;
   const parameters = runtimeExecutable.split(' ');
-  const command = parameters[0];
+  let command = parameters[0];
+  // We need to append .cmd to command if we are on windows because without it
+  // the spawn method can throw ENOENT error
+  if (process.platform === 'win32') {
+    command = `${command}.cmd`;
+  }
   const initialArgs = parameters.slice(1);
   const runtimeArgs = [].concat(initialArgs, args);
 
